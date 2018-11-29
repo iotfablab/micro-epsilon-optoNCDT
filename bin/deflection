@@ -1,0 +1,6 @@
+#!/usr/bin/env python3
+
+import deflection
+
+if __name__ == '__main__':
+    deflection.main()
