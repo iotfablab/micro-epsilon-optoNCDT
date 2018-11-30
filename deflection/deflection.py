@@ -11,6 +11,8 @@ import socket
 import logging
 import json
 import argparse
+import time
+import datetime
 from influxdb import InfluxDBClient
 from influxdb.client import InfluxDBClientError
 
@@ -54,7 +56,7 @@ def send_data(ip, port, db_host, db_port, db_name, use_udp, udp_port):
         try:
             client = InfluxDBClient(host=db_host, port=db_port, use_udp=True, udp_port=udp_port)
             logger.info('InfluxDB Client Created for UDP Sending')
-        except InfluxDBClient as e:
+        except InfluxDBClientError as e:
             logger.exception('Exception while InfluxDB Client Creation for UDP')
             raise(e)
             sys.exit(2)
@@ -68,7 +70,8 @@ def send_data(ip, port, db_host, db_port, db_name, use_udp, udp_port):
                 {
                     "measurement": "deflection",
                     "fields": {
-                        "value": 0.0
+                        "value": 0.0,
+                        "status": 0
                     }
                 }
             ]
@@ -94,7 +97,8 @@ def send_data(ip, port, db_host, db_port, db_name, use_udp, udp_port):
                     "loc": "hull"
                 },
                 "fields": {
-                    "value": 0.0
+                    "value": 0.0,
+                    "status": 0
                 }
             }
         ]
@@ -126,6 +130,7 @@ def send_data(ip, port, db_host, db_port, db_name, use_udp, udp_port):
             if use_udp:
                 # send data using UDP
                 measurement["points"][0]["fields"]["value"] = raw_to_mm(raw_sensor_val)
+                measurement["time"] = time.time()
                 logger.debug(measurement)
                 try:
                     client.send_packet(measurement)
@@ -136,6 +141,7 @@ def send_data(ip, port, db_host, db_port, db_name, use_udp, udp_port):
             else:
                 # send data using HTTP
                 measurement[0]["fields"]["value"] = raw_to_mm(raw_sensor_val)
+                measurement[0]["time"] = datetime.datetime.isoformat('T') + 'Z'
                 logger.debug(measurement)
                 try:
                     client.write_points(measurement)
