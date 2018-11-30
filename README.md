@@ -49,20 +49,32 @@ IP address of stream socket is mandatory.
 
 ### UDP
 1. IP address of the stream socket (mandatory)
+
 2. UDP Port value (mandatory)
 
-
-    $ deflection --udp --udp-port 20001 --ip 192.168.10.122
+        $ deflection --udp --udp-port 20001 --ip 192.168.10.122
 
 
 ### HTTP
 1. IP address of stream socket (mandatory)
+
 2. InfluxDB Database Name (mandatory)
 
 
-    $ deflection --http --db-name test --ip 192.168.10.122
+        $ deflection --http --db-name test --ip 192.168.10.122
 
+## Development
 
+Use `virtualenv` to create a test environment as follows:
+
+    virtualenv -p python3 testenv
+    . testenv/bin/activate
+
+    pip install -e .
+
+To exit the `virtualenv`
+
+     deactivate
 
 ## Maintainer
 
