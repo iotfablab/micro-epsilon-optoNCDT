@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='deflection',
-      version='1.1',
+      version='1.2',
       description='Extract Micro-Epsilon OptoNCDT values and store into InfluxDB',
       long_description=readme(),
       url='https://github.com/iotfablab/micro-epsilon-OptoNCDT',
