@@ -42,7 +42,9 @@ sock = None
 # InfluxDB Client
 client = None
 
-raw_to_mm = lambda raw_val: float(((raw_val - DRANGEMIN) * MEASRANGE) / (DRANGEMAX - DRANGEMIN) + OFFSET)
+def raw_to_mm(raw_val):
+    global DRANGEMAX, DRANGEMIN, MEASRANGE, OFFSET
+    return float(((raw_val - DRANGEMIN) * MEASRANGE) / (DRANGEMAX - DRANGEMIN) + OFFSET)
 
 def send_data(ip, port, db_host, db_port, db_name, use_udp, udp_port):
     """Main Function to read from Stream Socket, Convert Raw value to Metric,
@@ -121,8 +123,9 @@ def send_data(ip, port, db_host, db_port, db_name, use_udp, udp_port):
         raw_sensor_val = 0
         # read raw values from Stream Socket
         data = sock.recv(44)
-        # Unpack 44 Bytes worth of data according to IF1032's Manual
-        preamble, article, serial, x1, x2, status, bpf, mValCounter, CH1, CH2, CH3 = struct.unpack('<4sIIQHhIIIII', data)
+        if len(data) == 44:
+            # Unpack 44 Bytes worth of data according to IF1032's Manual
+            preamble, article, serial, x1, x2, status, bpf, mValCounter, CH1, CH2, CH3 = struct.unpack('<4sIIQHhIIIII', data)
 
         if preamble == b'SAEM' and len(data) == 44:
             # Current Setting provides values on Channel 3
@@ -196,10 +199,12 @@ def main():
         CONF = _conf['NCDT'] # store conf for NCDT
 
     # Store all Conversion Variables
+    global DRANGEMAX, DRANGEMIN, MEASRANGE, OFFSET
     DRANGEMAX = CONF['conversion']['DRANGEMAX']
     DRANGEMIN = CONF['conversion']['DRANGEMIN']
     MEASRANGE = CONF['conversion']['MEASRANGE']
     OFFSET = CONF['conversion']['OFFSET']
+    print(DRANGEMAX, DRANGEMIN, MEASRANGE, OFFSET)
 
     if len(sys.argv) == 1:
         # Default script execution
